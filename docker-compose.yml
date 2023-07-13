@@ -6,7 +6,7 @@ x-spark-common:
   &spark-common
   image: docker.io/bitnami/spark:3.4.1
   volumes:
-    - ./:/app
+    - ./:/data/
 
   environment:
     &spark-common-env
@@ -26,7 +26,7 @@ services:
       JUPYTER_ENABLE_LAB: yes
 
     volumes:
-      - ./:/home/jovyan/work/
+      - ./:/data/
 
     ports:
       - 8888:8888
