@@ -1,0 +1,59 @@
+# Copyright VMware, Inc.
+# SPDX-License-Identifier: APACHE-2.0
+
+version: '3.8'
+x-spark-common:
+  &spark-common
+  image: docker.io/bitnami/spark:3.4.1
+  volumes:
+    - ./:/app
+
+  environment:
+    &spark-common-env
+    SPARK_RPC_AUTHENTICATION_ENABLED: 'no'
+    SPARK_RPC_ENCRYPTION_ENABLED: 'no'
+    SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED: 'no'
+    SPARK_SSL_ENABLED: 'no'
+  user: root
+
+
+services:
+  jupyter:
+    image: jupyter/pyspark-notebook:spark-3.4.1
+
+    environment:
+      SPARK_MASTER: "spark://spark:7077"
+      JUPYTER_ENABLE_LAB: yes
+
+    volumes:
+      - ./:/home/jovyan/work/
+
+    ports:
+      - 8888:8888
+      - 4040:4040
+
+  spark:
+    <<: *spark-common
+    environment:
+      <<: *spark-common-env
+      SPARK_MODE: master
+    ports:
+      - 8099:8080
+
+  worker:
+    <<: *spark-common
+    deploy:
+      replicas: 2
+
+    environment:
+      <<: *spark-common-env
+      SPARK_MODE: worker
+      SPARK_MASTER_URL: spark://spark:7077
+      SPARK_WORKER_MEMORY: 2G
+      SPARK_WORKER_CORES: 2
+
+    depends_on:
+      - spark
+
+
+
