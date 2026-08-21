@@ -6,7 +6,7 @@ x-spark-common:
   &spark-common
   image: docker.io/bitnami/spark:3.4.1
   volumes:
-    - ./:/app
+    - ./databases/:/data/
 
   environment:
     &spark-common-env
@@ -19,14 +19,15 @@ x-spark-common:
 
 services:
   jupyter:
+    # user: ${UID}
     image: jupyter/pyspark-notebook:spark-3.4.1
-
     environment:
       SPARK_MASTER: "spark://spark:7077"
       JUPYTER_ENABLE_LAB: yes
 
     volumes:
-      - ./:/home/jovyan/work/
+      - ./notebooks/:/home/jovyan/work/
+      - ./databases/:/data
 
     ports:
       - 8888:8888
